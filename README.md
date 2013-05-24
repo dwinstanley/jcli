@@ -3,39 +3,38 @@ jcli
 
 A Simple JIRA Command Line Interface
 
-## Setup:
+### Setup:
+```
+git clone https://github.com/dwinstanley/jcli.git   
+pip install requests 
+pip install jira-python
+```
 
-git clone https://github.com/dwinstanley/jcli.git
-pip install [requests](http://docs.python-requests.org/en/latest/index.html)
-pip install [jira-python](http://jira-python.readthedocs.org/en/latest/index.html)
-Edit .jcli with your JIRA setup and place it in your home directory.
+Edit .jcli with your JIRA setup and place it in your home directory.   
 
-## Usage examples:
+### Usage examples:
 
-Get help:
-devbox:~]$ jcli -h
+Resove an issue (with time taken and resolution):   
+`devbox:~]$ jcli -k SUPPORT-123 -t Resolved -T 15m -r Fixed`
 
-Resove an issue (with time taken and resolution):
-devbox:~]$ jcli -k SUPPORT-123 -t Resolved -T 15m -r Fixed
+Assign an issue:   
+`devbox:~]$ jcli -k SUPPORT-123 -a jira.user`
 
-Assign an issue: 
-devbox:~]$ jcli -k SUPPORT-123 -a jira.user
+Search for an issue (using JQL):   
+`devbox:~]$ jcli -s "assignee = jira.user and status = open"`
 
-Search for an issue (using JQL):
-devbox:~]$ jcli -s "assignee = jira.user and status = open"
+List an issue description:   
+`devbox:~]$ jcli -k SUPPORT-123 -d`
 
-List an issue description:
-devbox:~]$ jcli -k SUPPORT-123 -d
-
-## .jcli
+### .jcli
 
 Edit options section to your own JIRA server setup and login credentials
 
-Add JQL favourite shortcuts to the favourites section eg:
-    mytix = assignee = some.user status = open
+Add JQL favourite shortcuts to the favourites section eg:   
+`mytix = assignee = some.user status = open`
 
 Note that no quotes are needed here. Crazy.
 
-## Finally
+### Finally
 
 There will be bugs! It's very early days!
