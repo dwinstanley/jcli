@@ -180,7 +180,7 @@ if __name__ == "__main__":
         print(jcli.transition(args.k, args.t, args.c, args.T, args.r))
     # Assign a ticket
     elif args.a and args.k:
-        print(jcli.assign(args.k, args.a, args.l))
+        print(jcli.assign(args.k, args.a))
     # Comment on a ticket
     elif args.c and args.k:
         print(jcli.comment(args.k, args.c))
