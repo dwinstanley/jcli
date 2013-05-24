@@ -103,7 +103,8 @@ def list(key, choice):
             return ''.join('\n' + user.name for user in 
                     jira.search_assignable_users_for_issues(None, None, key))
         elif choice == 'resolutions':
-            return ''.join('\n' + resolution.name for resolution in jira.resolutions())
+            return ''.join('\n' + resolution.name 
+                        for resolution in jira.resolutions())
     except Exception, e:
         return traceback.print_exc(e)
 
@@ -121,13 +122,13 @@ if __name__ == "__main__":
     muxgroup = parser.add_mutually_exclusive_group()
     group = parser.add_argument_group('Use with -k')
     muxgroup.add_argument('-s', type=str, metavar='"jql query"',
-            help="Search for issues using JQL. Displays key, summary, status, \
-                    priority and assignee")
+            help='Search for issues using JQL. Displays key, summary, status, \
+                    priority and assignee')
     muxgroup.add_argument('-f', metavar='favourite', type=str, 
             help='Use your favourite JQL shortcut defined in ~/.jcli')
     muxgroup.add_argument('-k', metavar="key", type=str, 
-            help="Issue key reference. If used alone it will provide a basic \
-                    summary of the issue")
+            help='Issue key reference. If used alone it will provide a basic \
+                    summary of the issue')
     group.add_argument('-d', action='store_true', 
             help='List brief issue description')
     group.add_argument('-D', action='store_true', 
@@ -145,7 +146,8 @@ if __name__ == "__main__":
             help='Comment on a ticket or when transitioning an issue.')
     group.add_argument('-l', metavar="states, users, resolutions", type=str, 
             choices=['states', 'users', 'resolutions'],
-            help='List available \'states\', \'users\' \'resolutions\' for this ticket.')
+            help='List available \'states\', \'users\' \'resolutions\' \
+                    for this ticket.')
     args = parser.parse_args()
 
     # Search
