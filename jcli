@@ -1,0 +1,185 @@
+#!/usr/bin/python
+import os
+import sys
+import string
+import argparse
+import traceback
+import ConfigParser
+from jira.client import JIRA
+
+def get_transition_id(issue, transition):
+    transitions = jira.transitions(issue)
+    for t in transitions:
+        if string.lower(t['to']['name']) == string.lower(transition): 
+            return t['id']
+    return False 
+
+def get_resolution_id(resolution):
+    resolutions = jira.resolutions()
+    for r in resolutions:
+        if string.lower(r.name) == string.lower(resolution):
+            return r.id
+    return False
+
+# TODO Add common jql escape sequences 
+def jql_escape(jql):
+    return string.replace(jql, '.', '\u002e')
+
+def search(jql):
+    try:
+        issues = jira.search_issues(jql_escape(jql))
+        return ''.join('\n' + issue.key + 
+                '\n\tSummary: ' + issue.fields.summary + 
+                '\n\tPriority: ' + issue.fields.priority.name + 
+                '\n\tStatus: ' + issue.fields.status.name + 
+                '\n\tAssignee: ' + issue.fields.assignee.name 
+                    for issue in issues)
+    except Exception, e:
+        return traceback.print_exc(e)
+
+def describe(key):
+    try:
+        issue = jira.issue(key)
+        return issue.fields.description
+    except Exception, e:
+        return traceback.print_exc(e)
+
+def describe_full(key):
+    try:
+        iss_desc = describe(key)
+        issue = jira.issue(key)
+        return iss_desc + '\n'.join('\n\n--- Comment Author: ' + 
+                     comment.author.displayName + ' | Comment created: ' + 
+                     string.splitfields(comment.created,'T')[0] + '\n\n' + 
+                     comment.body for comment in issue.fields.comment.comments)
+    except Exception, e:
+        return traceback.print_exc(e)
+
+def transition(key, transition, comment, timespent, resolution):
+    try:
+        issue = jira.issue(key)
+        fields = {}
+        # Get valid transition ID 
+        tid = get_transition_id(issue, transition)
+        if not tid:
+            return "Invalid transition state."
+        if resolution:
+            rid = get_resolution_id(resolution)
+            if not rid:
+                return "Invalid resolution state."
+            fields['resolution'] = {"id": rid}
+        jira.transition_issue(issue.id, tid, fields, comment)
+        if timespent:
+            jira.add_worklog(issue.id, timespent)
+        return 'Success!'
+    except Exception, e:
+        return traceback.print_exc(e)
+
+def assign(key, user, list):
+    try:
+        issue = jira.issue(key)
+        if list:
+            return ''.join('\n' + 
+                user.name for user in 
+                    jira.search_assignable_users_for_issues(None,None,key))
+        else:
+            jira.assign_issue(issue, user)
+            return 'Success!'
+    except Exception, e:
+        return traceback.print_exc(e)
+
+def comment(key, comment):
+    try:
+        jira.add_comment(key, comment)
+        return 'Success!'
+    except Exception, e:
+        return traceback.print_exc(e)
+
+def list(key, choice):
+    try:
+        issue = jira.issue(key)
+        transitions = jira.transitions(issue)
+        if choice == 'states':
+            return ''.join(transition['to']['name'] + '\n' 
+                    for transition in transitions)
+        elif choice == 'users':
+            return ''.join('\n' + user.name for user in 
+                    jira.search_assignable_users_for_issues(None, None, key))
+        elif choice == 'resolutions':
+            return ''.join('\n' + resolution.name for resolution in jira.resolutions())
+    except Exception, e:
+        return traceback.print_exc(e)
+
+if __name__ == "__main__":
+    config = ConfigParser.RawConfigParser()
+    config.read(os.path.expanduser('~/.jcli'))
+    options = {
+        'verify': config.getboolean('options', 'ssl_verify'),
+        'server': config.get('options', 'server'),
+    }
+    user = config.get('options', 'user')
+    password = config.get('options', 'password')
+    jira = JIRA(options, basic_auth=(user, password))
+    parser = argparse.ArgumentParser(description='JIRA CLI')
+    muxgroup = parser.add_mutually_exclusive_group()
+    group = parser.add_argument_group('group')
+    muxgroup.add_argument('-s', type=str, metavar='"jql query"',
+            help="Search for issues using JQL. Displays key, summary, status, \
+                    priority and assignee")
+    muxgroup.add_argument('-k', metavar="key", type=str, 
+            help="Issue key reference. If used alone it will provide a basic \
+                    summary of the issue")
+    parser.add_argument('-d', action='store_true', 
+            help='List brief issue description')
+    parser.add_argument('-D', action='store_true', 
+            help='List issue description with all comments')
+    parser.add_argument('-t', metavar="state", type=str, 
+            help='Transition issue to this state. \
+                    Use -c for an optional comment.')
+    parser.add_argument('-T', metavar="time spent", type=str, 
+            help='Time spent. Eg 2d, 1w, 15m')
+    parser.add_argument('-r', metavar="resolution", type=str, 
+            help='Resolution type')
+    parser.add_argument('-a', metavar="user", type=str, 
+            help='Assign issue to this user')
+    parser.add_argument('-c', metavar='"comment"', type=str, 
+            help='Comment on a ticket or when transitioning an issue.')
+    parser.add_argument('-l', metavar="states, users, resolutions", type=str, 
+            choices=['states', 'users', 'resolutions'],
+            help='List available \'states\', \'users\' \'resolutions\' for this ticket.')
+    parser.add_argument('-f', metavar='favourite', type=str, 
+            help='Use your favourite JQL shortcut defined in ~/.jcli')
+    args = parser.parse_args()
+
+    # Search
+    if args.s:
+        print search(args.s)
+    # Search using favourite
+    if args.f:
+        try:
+            print search(config.get('favourites', args.f))
+        except:
+            print "Invalid favourite."
+    # Brief ticket description
+    elif args.d and args.k:
+        print describe(args.k)
+    # Description with comments
+    elif args.D and args.k: 
+        print describe_full(args.k)
+    # Transition a ticket
+    elif args.t and args.k:
+        print transition(args.k, args.t, args.c, args.T, args.r)
+    # Assign a ticket
+    elif args.a and args.k:
+        print assign(args.k, args.a, args.l)
+    # Comment on a ticket
+    elif args.c and args.k:
+        print comment(args.k, args.c)
+    # List available ticket arguments
+    elif args.l and args.k:
+        print list(args.k, args.l)
+    # Quick ticket mini-summary
+    elif args.k:
+        print search("key = %s" % args.k)
+    else:
+        sys.exit()

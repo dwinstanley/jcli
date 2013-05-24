@@ -1,0 +1,9 @@
+[options]
+user = some.user
+password = somepassword 
+server = https://jira.yourdomain.com
+ssl_verify = True 
+
+[favourites]
+mytix = assignee = some.user status = open
+
