@@ -1,4 +1,6 @@
 #!/usr/bin/env python
+from __future__ import print_function
+
 import os
 import sys
 import string
@@ -160,34 +162,34 @@ if __name__ == "__main__":
 
     # Search
     if args.s:
-        print jcli.search(args.s)
+        print(jcli.search(args.s))
     # Search using favourite
     if args.f:
         try:
-            print jcli.search(config.get('favourites', args.f))
+            print(jcli.search(config.get('favourites', args.f)))
         except:
-            print "Invalid favourite."
+            print("Invalid favourite.")
     # Brief ticket description
     elif args.d and args.k:
-        print jcli.describe(args.k)
+        print(jcli.describe(args.k))
     # Description with comments
     elif args.D and args.k:
-        print jcli.describe_full(args.k)
+        print(jcli.describe_full(args.k))
     # Transition a ticket
     elif args.t and args.k:
-        print jcli.transition(args.k, args.t, args.c, args.T, args.r)
+        print(jcli.transition(args.k, args.t, args.c, args.T, args.r))
     # Assign a ticket
     elif args.a and args.k:
-        print jcli.assign(args.k, args.a, args.l)
+        print(jcli.assign(args.k, args.a, args.l))
     # Comment on a ticket
     elif args.c and args.k:
-        print jcli.comment(args.k, args.c)
+        print(jcli.comment(args.k, args.c))
     # List available ticket arguments
     elif args.l and args.k:
-        print list(args.k, args.l)
+        print(list(args.k, args.l))
     # Quick ticket mini-summary
     elif args.k:
-        print jcli.search("key = %s" % args.k)
+        print(jcli.search("key = %s" % args.k))
     else:
         parser.print_usage()
         sys.exit()
