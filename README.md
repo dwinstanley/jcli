@@ -31,7 +31,7 @@ List an issue description:
 Edit options section to your own JIRA server setup and login credentials
 
 Add JQL favourite shortcuts to the favourites section eg:   
-`mytix = assignee = some.user status = open`
+`mytix = assignee = some.user and status = open`
 
 Note that no quotes are needed here. Crazy.
 

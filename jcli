@@ -157,7 +157,8 @@ if __name__ == "__main__":
             help='Comment on a ticket or when transitioning an issue.')
     group.add_argument('-l', metavar="states, users, resolutions", type=str,
             choices=['states', 'users', 'resolutions'],
-            help='List available \'states\', \'users\' \'resolutions\' for this ticket.')
+            help='List available \'states\', \'users\' \'resolutions\' \
+                    for this ticket.')
     args = parser.parse_args()
 
     jcli = JCLI(jira)
