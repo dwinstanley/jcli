@@ -118,6 +118,8 @@ class JCLI:
             return traceback.print_exc(e)
 
 if __name__ == "__main__":
+    exit_status = 0  # EX_SUCCESS
+
     config = ConfigParser.RawConfigParser()
     config.read(os.path.expanduser('~/.jcli'))
     options = {
@@ -192,4 +194,6 @@ if __name__ == "__main__":
         print(jcli.search("key = %s" % args.k))
     else:
         parser.print_usage()
-        sys.exit()
+        exit_status = 64  # EX_USAGE
+
+    sys.exit(exit_status)
