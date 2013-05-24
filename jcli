@@ -122,33 +122,33 @@ if __name__ == "__main__":
     jira = JIRA(options, basic_auth=(user, password))
     parser = argparse.ArgumentParser(description='JIRA CLI')
     muxgroup = parser.add_mutually_exclusive_group()
-    group = parser.add_argument_group('group')
+    group = parser.add_argument_group('Use with -k')
     muxgroup.add_argument('-s', type=str, metavar='"jql query"',
             help="Search for issues using JQL. Displays key, summary, status, \
                     priority and assignee")
+    muxgroup.add_argument('-f', metavar='favourite', type=str, 
+            help='Use your favourite JQL shortcut defined in ~/.jcli')
     muxgroup.add_argument('-k', metavar="key", type=str, 
             help="Issue key reference. If used alone it will provide a basic \
                     summary of the issue")
-    parser.add_argument('-d', action='store_true', 
+    group.add_argument('-d', action='store_true', 
             help='List brief issue description')
-    parser.add_argument('-D', action='store_true', 
+    group.add_argument('-D', action='store_true', 
             help='List issue description with all comments')
-    parser.add_argument('-t', metavar="state", type=str, 
+    group.add_argument('-t', metavar="state", type=str, 
             help='Transition issue to this state. \
                     Use -c for an optional comment.')
-    parser.add_argument('-T', metavar="time spent", type=str, 
+    group.add_argument('-T', metavar="time spent", type=str, 
             help='Time spent. Eg 2d, 1w, 15m')
-    parser.add_argument('-r', metavar="resolution", type=str, 
+    group.add_argument('-r', metavar="resolution", type=str, 
             help='Resolution type')
-    parser.add_argument('-a', metavar="user", type=str, 
+    group.add_argument('-a', metavar="user", type=str, 
             help='Assign issue to this user')
-    parser.add_argument('-c', metavar='"comment"', type=str, 
+    group.add_argument('-c', metavar='"comment"', type=str, 
             help='Comment on a ticket or when transitioning an issue.')
-    parser.add_argument('-l', metavar="states, users, resolutions", type=str, 
+    group.add_argument('-l', metavar="states, users, resolutions", type=str, 
             choices=['states', 'users', 'resolutions'],
             help='List available \'states\', \'users\' \'resolutions\' for this ticket.')
-    parser.add_argument('-f', metavar='favourite', type=str, 
-            help='Use your favourite JQL shortcut defined in ~/.jcli')
     args = parser.parse_args()
 
     # Search
@@ -182,4 +182,5 @@ if __name__ == "__main__":
     elif args.k:
         print search("key = %s" % args.k)
     else:
+        parser.print_usage()
         sys.exit()
