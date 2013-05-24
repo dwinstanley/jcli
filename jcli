@@ -168,7 +168,7 @@ if __name__ == "__main__":
         try:
             print(jcli.search(config.get('favourites', args.f)))
         except:
-            print("Invalid favourite.")
+            print("Invalid favourite.", file=sys.stderr)
     # Brief ticket description
     elif args.d and args.k:
         print(jcli.describe(args.k))
