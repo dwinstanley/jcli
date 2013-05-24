@@ -56,9 +56,9 @@ class JCLI:
             iss_desc = self.describe(key)
             issue = self.jira.issue(key)
             return iss_desc + '\n'.join('\n\n--- Comment Author: ' +
-                         comment.author.displayName + ' | Comment created: ' +
-                         string.splitfields(comment.created,'T')[0] + '\n\n' +
-                         comment.body for comment in issue.fields.comment.comments)
+                    comment.author.displayName + ' | Comment created: ' +
+                    string.splitfields(comment.created,'T')[0] + '\n\n' +
+                    comment.body for comment in issue.fields.comment.comments)
         except Exception, e:
             return traceback.print_exc(e)
 
@@ -82,16 +82,11 @@ class JCLI:
         except Exception, e:
             return traceback.print_exc(e)
 
-    def assign(self, key, user, list):
+    def assign(self, key, user):
         try:
             issue = self.jira.issue(key)
-            if list:
-                return ''.join('\n' +
-                    user.name for user in
-                        self.jira.search_assignable_users_for_issues(None,None,key))
-            else:
-                self.jira.assign_issue(issue, user)
-                return 'Success!'
+            self.jira.assign_issue(issue, user)
+            return 'Success!'
         except Exception, e:
             return traceback.print_exc(e)
 
@@ -111,9 +106,11 @@ class JCLI:
                         for transition in transitions)
             elif choice == 'users':
                 return ''.join('\n' + user.name for user in
-                        self.jira.search_assignable_users_for_issues(None, None, key))
+                        self.jira.search_assignable_users_for_issues(None, 
+                            None, key))
             elif choice == 'resolutions':
-                return ''.join('\n' + resolution.name for resolution in self.jira.resolutions())
+                return ''.join('\n' + resolution.name 
+                            for resolution in self.jira.resolutions())
         except Exception, e:
             return traceback.print_exc(e)
 
