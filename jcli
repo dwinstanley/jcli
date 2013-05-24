@@ -55,7 +55,7 @@ def describe_full(key):
     except Exception, e:
         return traceback.print_exc(e)
 
-def transition(key, transition, comment, timespent, resolution):
+def transition(key, transition, comment, timespent, resolution, assignee):
     try:
         issue = jira.issue(key)
         fields = {}
@@ -71,20 +71,17 @@ def transition(key, transition, comment, timespent, resolution):
         jira.transition_issue(issue.id, tid, fields, comment)
         if timespent:
             jira.add_worklog(issue.id, timespent)
+        if assignee:
+            assign(key, assignee)
         return 'Success!'
     except Exception, e:
         return traceback.print_exc(e)
 
-def assign(key, user, list):
+def assign(key, assignee):
     try:
         issue = jira.issue(key)
-        if list:
-            return ''.join('\n' + 
-                user.name for user in 
-                    jira.search_assignable_users_for_issues(None,None,key))
-        else:
-            jira.assign_issue(issue, user)
-            return 'Success!'
+        jira.assign_issue(issue, assignee)
+        return 'Success!'
     except Exception, e:
         return traceback.print_exc(e)
 
@@ -168,7 +165,7 @@ if __name__ == "__main__":
         print describe_full(args.k)
     # Transition a ticket
     elif args.t and args.k:
-        print transition(args.k, args.t, args.c, args.T, args.r)
+        print transition(args.k, args.t, args.c, args.T, args.r, args.a)
     # Assign a ticket
     elif args.a and args.k:
         print assign(args.k, args.a, args.l)
