@@ -14,7 +14,7 @@ Edit .jcli with your JIRA setup and place it in your home directory.
 
 ### Usage examples:
 
-Resove an issue (with time taken and resolution):   
+Resolve an issue (with time taken and resolution):   
 `devbox:~]$ jcli -k SUPPORT-123 -t Resolved -T 15m -r Fixed`
 
 Assign an issue:   
