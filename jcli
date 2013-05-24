@@ -80,16 +80,11 @@ class JCLI:
         except Exception, e:
             return traceback.print_exc(e)
 
-    def assign(self, key, user, list):
+    def assign(self, key, user):
         try:
             issue = self.jira.issue(key)
-            if list:
-                return ''.join('\n' +
-                    user.name for user in
-                        self.jira.search_assignable_users_for_issues(None,None,key))
-            else:
-                self.jira.assign_issue(issue, user)
-                return 'Success!'
+            self.jira.assign_issue(issue, user)
+            return 'Success!'
         except Exception, e:
             return traceback.print_exc(e)
 
