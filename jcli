@@ -156,6 +156,8 @@ if __name__ == "__main__":
             help='List available \'states\', \'users\' \'resolutions\' for this ticket.')
     args = parser.parse_args()
 
+    jcli = JCLI(jira)
+
     # Search
     if args.s:
         print jcli.search(args.s)
