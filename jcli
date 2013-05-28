@@ -186,7 +186,7 @@ if __name__ == "__main__":
         print(jcli.comment(args.k, args.c))
     # List available ticket arguments
     elif args.l and args.k:
-        print(list(args.k, args.l))
+        print(jcli.list(args.k, args.l))
     # Quick ticket mini-summary
     elif args.k:
         print(jcli.search("key = %s" % args.k))
